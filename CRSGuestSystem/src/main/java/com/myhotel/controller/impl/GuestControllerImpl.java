@@ -1,6 +1,6 @@
 package com.myhotel.controller.impl;
 
-import java.util.List;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -48,21 +48,21 @@ public class GuestControllerImpl implements GuestController {
 	}
 
 	@Override
-	public ResponseEntity<List<GuestDTO>> getAll() {
+	public ResponseEntity<GuestDTO> get(Long guestId) {
 		try {
-			return new ResponseEntity<>(guestService.getAll(), HttpStatus.OK);
+			return new ResponseEntity<>(guestService.get(guestId), HttpStatus.OK);
 		} catch (RuntimeException e) {
-			log.info("Gettimg guest failed");
+			log.info("Getting guest with id : {} failed", guestId);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@Override
-	public ResponseEntity<GuestDTO> get(Long guestId) {
+	public ResponseEntity<GuestDTO> getByName(@NotNull String guestUserName) {
 		try {
-			return new ResponseEntity<>(guestService.get(guestId), HttpStatus.OK);
-		} catch (Exception e) {
-			log.info("Getting guest with id : {} failed", guestId);
+			return new ResponseEntity<>(guestService.getByName(guestUserName), HttpStatus.OK);
+		} catch (RuntimeException e) {
+			log.info("Getting guest with username : {} failed", guestUserName);
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -77,4 +77,5 @@ public class GuestControllerImpl implements GuestController {
 		}
 		return true;
 	}
+
 }

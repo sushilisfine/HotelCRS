@@ -1,8 +1,8 @@
 package com.myhotel.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+
+import javax.validation.constraints.NotNull;
 
 import org.springframework.stereotype.Service;
 
@@ -41,11 +41,9 @@ public class GuestServiceImpl implements GuestService {
 	}
 
 	@Override
-	public List<GuestDTO> getAll() {
-
-		List<Guest> guests = guestRepository.findAll();
-
-		return converteEntityToDTO(guests);
+	public GuestDTO getByName(@NotNull String guestUserName) {
+		Guest guest = getGuestByName(guestUserName);
+		return converteEntityToDTO(guest);
 	}
 
 	private Guest converteDTOToEntity(GuestDTO guestDTO) {
@@ -65,16 +63,19 @@ public class GuestServiceImpl implements GuestService {
 		return guestResponseDTO;
 	}
 
-	private List<GuestDTO> converteEntityToDTO(List<Guest> guests) {
-
-		List<GuestDTO> guestResponseDTO = new ArrayList<>();
-		guests.forEach(guest -> guestResponseDTO.add(converteEntityToDTO(guest)));
-		return guestResponseDTO;
-	}
-
 	public Guest getGuestById(Long guestId) {
 
 		Optional<Guest> guest = guestRepository.findById(guestId);
+		return guest.isPresent() ? guest.get() : new Guest();
+	}
+
+	/**
+	 * @param guestUserName
+	 * @returnGuest
+	 */
+	private Guest getGuestByName(@NotNull String guestUserName) {
+
+		Optional<Guest> guest = guestRepository.findByName(guestUserName);
 		return guest.isPresent() ? guest.get() : new Guest();
 	}
 

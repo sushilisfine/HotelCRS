@@ -91,14 +91,15 @@ class GuestControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void test1GetAllGuests() throws Exception {
+	void test1GetGuestByName() throws Exception {
 
 		List<GuestDTO> guestResObj = new ArrayList<>();
 		guestResObj.add(guestDTOObj());
 
-		lenient().doReturn(guestResObj).when(guestService).getAll();
+		lenient().doReturn(guestResObj).when(guestService).getByName("user");
 
-		mockMvc.perform(get("/api/v1/guests").accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+		mockMvc.perform(get("/api/v1/guests").param("guest_name", "user").accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isOk());
 
 		assertNotNull(guestResObj);
 
