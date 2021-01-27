@@ -3,7 +3,6 @@ package com.myhotel.controller;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,13 +28,4 @@ public interface ReservationController {
 	@PostMapping
 	public ResponseEntity<ReservationDTO> add(@RequestBody ReservationDTO reservation);
 
-	@ApiOperation(value = "Update Reservation information.")
-	@ApiResponses(value = { @ApiResponse(code = 200, message = "Reservation information updated successfully."),
-			@ApiResponse(code = 401, message = "Authentication failed."),
-			@ApiResponse(code = 400, message = "Inputs not correct"),
-			@ApiResponse(code = 500, message = "Internal Server Error") })
-	@PreAuthorize("hasAnyRole('USER','ADMIN')")
-	@PostMapping("/{reservation_id}")
-	public ResponseEntity<ReservationDTO> update(@PathVariable("reservation_id") Long reservationId,
-			@RequestBody ReservationDTO reservation);
 }

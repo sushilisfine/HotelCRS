@@ -107,4 +107,17 @@ class GuestServiceTest {
 
 	}
 
+	@Test
+	void test3GetGuestByName() {
+
+		Guest guest = guestObj();
+
+		doReturn(Optional.of(guest)).when(guestRepository).findByName("getByName");
+
+		GuestDTO guestResponse = guestService.getByName("getByName");
+
+		assertNotNull(guestResponse);
+
+	}
+
 }

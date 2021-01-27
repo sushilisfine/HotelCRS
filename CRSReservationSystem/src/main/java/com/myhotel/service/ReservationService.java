@@ -12,12 +12,6 @@ public interface ReservationService {
 	ReservationDTO create(ReservationDTO reservationReqObj);
 
 	/**
-	 * @param reservation
-	 * @return ReservationDTO
-	 */
-	ReservationDTO update(ReservationDTO reservation);
-
-	/**
 	 * @param reservationId
 	 * @return Reservation
 	 */

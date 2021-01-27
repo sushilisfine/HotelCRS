@@ -1,17 +1,17 @@
 package com.myhotel.managment.controller.impl;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.myhotel.managment.constants.HotelConstants;
 import com.myhotel.managment.controller.CategoryController;
 import com.myhotel.managment.domain.Category;
 import com.myhotel.managment.domain.Hotel;
 import com.myhotel.managment.dto.CategoryDTO;
 import com.myhotel.managment.service.CategoryService;
+import com.myhotel.managment.util.Response;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,15 +36,19 @@ public class CategoryControllerImpl implements CategoryController {
 	 * @return the saved ResponseEntity<CategoryDTO>.
 	 */
 	@Override
-	public ResponseEntity<CategoryDTO> add(Long hotelId, CategoryDTO category) {
+	public ResponseEntity<Response<Object>> add(Long hotelId, CategoryDTO category) {
 
 		category.setHotelId(hotelId);
 
 		try {
 			if (validateHotel(hotelId))
-				return new ResponseEntity<>(categoryService.add(category), HttpStatus.CREATED);
+				return ResponseEntity.status(HttpStatus.CREATED)
+						.body(Response.builder().data(categoryService.add(category)).message(HotelConstants.SUCCESS)
+								.status(HttpStatus.CREATED).build());
 			else
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.builder().data(null)
+						.message("Hotel not found").status(HttpStatus.BAD_REQUEST).build());
+
 		} catch (RuntimeException e) {
 			log.info("Creating new Category failed");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -63,16 +67,21 @@ public class CategoryControllerImpl implements CategoryController {
 	 * @return the updated ResponseEntity<CategoryDTO>.
 	 */
 	@Override
-	public ResponseEntity<CategoryDTO> update(Long hotelId, Long categoryId, CategoryDTO category) {
+	public ResponseEntity<Response<Object>> update(Long hotelId, Long categoryId, CategoryDTO category) {
 
 		category.setHotelId(hotelId);
 		category.setId(categoryId);
 
 		try {
+
 			if (validateHotelAndCategory(hotelId, categoryId))
-				return new ResponseEntity<>(categoryService.update(category), HttpStatus.OK);
+				return ResponseEntity.status(HttpStatus.CREATED)
+						.body(Response.builder().data(categoryService.update(category)).message(HotelConstants.SUCCESS)
+								.status(HttpStatus.OK).build());
 			else
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.builder().data(null)
+						.message("Hotel or category not found").status(HttpStatus.BAD_REQUEST).build());
+
 		} catch (RuntimeException e) {
 			log.info("Updating Category failed");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -90,13 +99,18 @@ public class CategoryControllerImpl implements CategoryController {
 	 * @return the ResponseEntity<CategoryDTO>.
 	 */
 	@Override
-	public ResponseEntity<CategoryDTO> get(Long hotelId, Long categoryId) {
+	public ResponseEntity<Response<Object>> get(Long hotelId, Long categoryId) {
 
 		try {
-			if (validateHotel(hotelId))
-				return new ResponseEntity<>(categoryService.get(categoryId), HttpStatus.OK);
+
+			if (validateHotelAndCategory(hotelId, categoryId))
+				return ResponseEntity.status(HttpStatus.CREATED)
+						.body(Response.builder().data(categoryService.get(categoryId)).message(HotelConstants.SUCCESS)
+								.status(HttpStatus.OK).build());
 			else
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.builder().data(null)
+						.message("Hotel or Category not found").status(HttpStatus.BAD_REQUEST).build());
+
 		} catch (RuntimeException e) {
 			log.info("Getting Categoriy failed");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -113,13 +127,18 @@ public class CategoryControllerImpl implements CategoryController {
 	 * @return the ResponseEntity<List<CategoryDTO>>.
 	 */
 	@Override
-	public ResponseEntity<List<CategoryDTO>> getAll(Long hotelId) {
+	public ResponseEntity<Response<Object>> getAll(Long hotelId) {
 
 		try {
 			if (validateHotel(hotelId))
-				return new ResponseEntity<>(categoryService.getAll(hotelId), HttpStatus.OK);
+
+				return ResponseEntity.status(HttpStatus.CREATED)
+						.body(Response.builder().data(categoryService.getAll(hotelId)).message(HotelConstants.SUCCESS)
+								.status(HttpStatus.OK).build());
 			else
-				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Response.builder().data(null)
+						.message("Hotel not found").status(HttpStatus.BAD_REQUEST).build());
+
 		} catch (RuntimeException e) {
 			log.info("Getting All Categories failed");
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

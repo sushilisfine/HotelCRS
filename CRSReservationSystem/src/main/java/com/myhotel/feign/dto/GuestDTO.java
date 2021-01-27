@@ -1,4 +1,4 @@
-package com.myhotel.feign.dto.response;
+package com.myhotel.feign.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,12 +11,14 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryDTO {
+public class GuestDTO {
 
 	private Long id;
 
-	private String descreption;
+	private String name;
 
-	private Double charges;
+	private String email;
+
+	private Long contact;
 
 }

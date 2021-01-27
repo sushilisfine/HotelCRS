@@ -1,5 +1,7 @@
 package com.myhotel.controller.impl;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,37 +36,14 @@ public class ReservationControllerImpl implements ReservationController {
 	@Override
 	public ResponseEntity<ReservationDTO> add(ReservationDTO reservation) {
 		try {
-			return new ResponseEntity<>(reservationService.create(reservation), HttpStatus.CREATED);
-		} catch (RuntimeException e) {
-			log.error(e.getMessage());
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-	}
-
-	/**
-	 * Updates a Reservation. Use the returned instance for further operations on
-	 * the clients end.
-	 * 
-	 * @param Long            reservation id, to validate reservation present and
-	 *                        update it
-	 * @param ReservationDTO, for creating Reservation.
-	 * @return the saved ResponseEntity<ReservationDTO>.
-	 */
-	@Override
-	public ResponseEntity<ReservationDTO> update(Long reservationId, ReservationDTO reservation) {
-		reservation.setId(reservationId);
-		try {
-
-			if (validateReservation(reservationId))
-				return new ResponseEntity<>(reservationService.update(reservation), HttpStatus.OK);
+			if (validateDates(reservation.getStartDate(), reservation.getStartDate()))
+				return new ResponseEntity<>(reservationService.create(reservation), HttpStatus.CREATED);
 			else
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
 		} catch (RuntimeException e) {
 			log.error(e.getMessage());
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
 	}
 
 	/**
@@ -79,6 +58,20 @@ public class ReservationControllerImpl implements ReservationController {
 
 		if (reservation.getId() == null) {
 			log.info("Unable to find reservation with id : {}", reservationId);
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Validate if the dates are valid type.
+	 * 
+	 * @param LocalDate from, LocalDate to.
+	 * @return boolean.
+	 */
+	private boolean validateDates(LocalDate from, LocalDate to) {
+		if (from.isAfter(to)) {
+			log.error("From date should be less than to date");
 			return false;
 		}
 		return true;

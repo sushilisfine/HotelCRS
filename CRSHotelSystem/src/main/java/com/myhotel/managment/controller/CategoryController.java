@@ -1,7 +1,5 @@
 package com.myhotel.managment.controller;
 
-import java.util.List;
-
 import javax.validation.constraints.NotNull;
 
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -15,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.myhotel.managment.dto.CategoryDTO;
+import com.myhotel.managment.util.Response;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +32,7 @@ public interface CategoryController {
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 	@PostMapping("categories")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<CategoryDTO> add(@NotNull @PathVariable("hotel_id") Long hotelId,
+	public ResponseEntity<Response<Object>> add(@NotNull @PathVariable("hotel_id") Long hotelId,
 			@NotNull @RequestBody CategoryDTO category);
 
 	@ApiOperation(value = "Update Category information.")
@@ -43,7 +42,7 @@ public interface CategoryController {
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 	@PutMapping("categories/{category_id}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<CategoryDTO> update(@NotNull @PathVariable("hotel_id") Long hotelId,
+	public ResponseEntity<Response<Object>> update(@NotNull @PathVariable("hotel_id") Long hotelId,
 			@NotNull @PathVariable("category_id") Long categoryId, @NotNull @RequestBody CategoryDTO category);
 
 	@ApiOperation(value = "Get All Categories information.")
@@ -53,7 +52,7 @@ public interface CategoryController {
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 	@GetMapping("categories")
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<List<CategoryDTO>> getAll(@NotNull @PathVariable("hotel_id") Long hotelId);
+	public ResponseEntity<Response<Object>> getAll(@NotNull @PathVariable("hotel_id") Long hotelId);
 
 	@ApiOperation(value = "Get Category information.")
 	@ApiResponses(value = { @ApiResponse(code = 200, message = "Category information fetched successfully."),
@@ -62,7 +61,7 @@ public interface CategoryController {
 			@ApiResponse(code = 500, message = "Internal Server Error") })
 	@GetMapping("categories/{category_id}")
 	@PreAuthorize("hasRole('USER')")
-	public ResponseEntity<CategoryDTO> get(@NotNull @PathVariable("hotel_id") Long hotelId,
+	public ResponseEntity<Response<Object>> get(@NotNull @PathVariable("hotel_id") Long hotelId,
 			@NotNull @PathVariable("category_id") Long categoryId);
 
 }

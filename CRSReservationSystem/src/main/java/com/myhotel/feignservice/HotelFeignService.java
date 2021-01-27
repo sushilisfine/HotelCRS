@@ -10,11 +10,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.myhotel.feign.dto.request.RoomUpdateRequestDTO;
-import com.myhotel.feign.dto.response.CategoryDTO;
-import com.myhotel.feign.dto.response.HotelDTO;
-import com.myhotel.feign.dto.response.OfferDTO;
-import com.myhotel.feign.dto.response.RoomDTO;
+import com.myhotel.feign.dto.CategoryDTO;
+import com.myhotel.feign.dto.HotelDTO;
+import com.myhotel.feign.dto.OfferDTO;
+import com.myhotel.feign.dto.RoomDTO;
 
 @FeignClient(name = "hotel-service", path = "api/v1")
 public interface HotelFeignService {
@@ -24,7 +23,7 @@ public interface HotelFeignService {
 
 	@PutMapping(value = "/hotels/{hotel_id}/rooms/{room_id}")
 	public ResponseEntity<RoomDTO> updateBooking(@PathVariable("hotel_id") Long hotelId,
-			@PathVariable("room_id") Long roomId, @RequestBody RoomUpdateRequestDTO roomUpdateRequestDTO);
+			@PathVariable("room_id") Long roomId, @RequestBody RoomDTO roomUpdateRequestDTO);
 
 	@GetMapping(value = "/hotels/{hotel_id}/rooms")
 	public ResponseEntity<List<RoomDTO>> getAllRooms(@PathVariable("hotel_id") Long hotelId);

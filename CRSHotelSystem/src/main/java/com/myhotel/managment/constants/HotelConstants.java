@@ -9,4 +9,8 @@ public class HotelConstants {
 	public static final String CATEGORY = "Category";
 	public static final String OFFER = "Offer";
 	public static final String ROOM = "Room";
+	
+	
+	public static final String SUCCESS = "Success";
+	
 }

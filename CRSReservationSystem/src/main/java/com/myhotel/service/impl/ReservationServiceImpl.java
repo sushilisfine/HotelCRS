@@ -12,12 +12,10 @@ import org.springframework.stereotype.Service;
 
 import com.myhotel.domain.Reservation;
 import com.myhotel.dto.ReservationDTO;
-import com.myhotel.exception.CustomException;
-import com.myhotel.feign.dto.request.RoomUpdateRequestDTO;
-import com.myhotel.feign.dto.response.CategoryDTO;
-import com.myhotel.feign.dto.response.GuestDTO;
-import com.myhotel.feign.dto.response.OfferDTO;
-import com.myhotel.feign.dto.response.RoomDTO;
+import com.myhotel.feign.dto.CategoryDTO;
+import com.myhotel.feign.dto.GuestDTO;
+import com.myhotel.feign.dto.OfferDTO;
+import com.myhotel.feign.dto.RoomDTO;
 import com.myhotel.feignservice.GuestFeignService;
 import com.myhotel.feignservice.HotelFeignService;
 import com.myhotel.repository.ReservationRepository;
@@ -46,6 +44,12 @@ public class ReservationServiceImpl implements ReservationService {
 		this.guestFeignService = guestFeignService;
 	}
 
+	/**
+	 * Creates a Reservation.
+	 * 
+	 * @param ReservationDTO , for creating Reservation.
+	 * @return the saved ReservationDTO.
+	 */
 	@Override
 	public ReservationDTO create(ReservationDTO reservationReqObj) {
 
@@ -60,13 +64,8 @@ public class ReservationServiceImpl implements ReservationService {
 		return converteEntityToDTO(createReservationEntry(category, requestedDates, offerDTO, reservationReqObj, room));
 	}
 
-	@Override
-	public ReservationDTO update(ReservationDTO reservation) {
-		return null;
-	}
-
 	/**
-	 * @returnGuestDTO
+	 * Get the logged in principal
 	 */
 	@HystrixCommand(fallbackMethod = "getPrincipalFallback")
 	private GuestDTO getPrincipalUser() {
@@ -76,11 +75,24 @@ public class ReservationServiceImpl implements ReservationService {
 		return guest != null ? guest : new GuestDTO();
 	}
 
+	/**
+	 * Circuit breaker fallback method for getting current logged in principal
+	 */
 	public GuestDTO getPrincipalFallback() {
 		log.error("Guest Service is down ");
 		return GuestDTO.builder().id(0L).name("Fallback").build();
 	}
 
+	/**
+	 * Creates a Reservation.
+	 * 
+	 * @param CategoryDTO
+	 * @param List<LocalDate>
+	 * @param OfferDTO
+	 * @param ReservationDTO
+	 * @param RoomDTO         for creating Reservation.
+	 * @return the saved Reservation.
+	 */
 	private Reservation createReservationEntry(CategoryDTO category, List<LocalDate> requestedDates, OfferDTO offerDTO,
 			ReservationDTO reservationReqObj, RoomDTO room) {
 
@@ -93,6 +105,12 @@ public class ReservationServiceImpl implements ReservationService {
 		return createEntry(reservationReqObj, totalCharges, offerDTO, room);
 	}
 
+	/**
+	 * Fetch the OfferDTO.
+	 * 
+	 * @param ReservationDTO , for getting Offer using the offerId.
+	 * @return the OfferDTO.
+	 */
 	@HystrixCommand(fallbackMethod = "getOfferFallback")
 	private OfferDTO getOffer(ReservationDTO reservationReqObj) {
 		OfferDTO offer = hotelFeignService.getOffer(reservationReqObj.getHotelId(), reservationReqObj.getOfferId(),
@@ -100,11 +118,20 @@ public class ReservationServiceImpl implements ReservationService {
 		return offer != null ? offer : OfferDTO.builder().id(0L).build();
 	}
 
+	/**
+	 * Fetch the OfferDTO fallback method
+	 */
 	public OfferDTO getOfferFallback() {
 		log.error("Offer Service is down ");
 		return OfferDTO.builder().id(0L).build();
 	}
 
+	/**
+	 * Fetch the CategoryDTO.
+	 * 
+	 * @param ReservationDTO , for getting Category using the categoryId.
+	 * @return the CategoryDTO.
+	 */
 	@HystrixCommand(fallbackMethod = "getCategoryFallback")
 	private CategoryDTO getCategory(ReservationDTO reservationReqObj) {
 		CategoryDTO category = hotelFeignService
@@ -112,13 +139,19 @@ public class ReservationServiceImpl implements ReservationService {
 		return category != null ? category : new CategoryDTO();
 	}
 
+	/**
+	 * Fetch the CategoryDTO fallback method
+	 */
 	public CategoryDTO getCategoryFallback() {
 		log.error("Category Service is down ");
 		return CategoryDTO.builder().id(0L).build();
 	}
 
+	/**
+	 * Updating the booking dates in the Room entity
+	 */
 	private RoomDTO updateBookingDates(List<LocalDate> requestedDates, ReservationDTO reservationReqObj, Long roomId) {
-		RoomUpdateRequestDTO roomRequestDTO = new RoomUpdateRequestDTO();
+		RoomDTO roomRequestDTO = new RoomDTO();
 		roomRequestDTO.setCategoryId(reservationReqObj.getCategoryId());
 		roomRequestDTO.setBookedDates(requestedDates);
 
@@ -127,16 +160,26 @@ public class ReservationServiceImpl implements ReservationService {
 		return room != null ? room : new RoomDTO();
 	}
 
+	/**
+	 * Getting the list of dates using the start date and end date.
+	 */
 	private List<LocalDate> getListOfDates(LocalDate startDate, LocalDate endDate) {
 
 		if (startDate.isAfter(endDate)) {
 			log.error("Start Date: {} is greater than: {}", startDate, endDate);
-			throw new CustomException("Start Date should be less than End Date, Please check");
 		}
 		Stream<LocalDate> dates = startDate.datesUntil(endDate.plusDays(1));
 		return dates.collect(Collectors.toList());
 	}
 
+	/**
+	 * Fetch the RoomDTO.
+	 * 
+	 * @param ReservationDTO
+	 * @param LocalDate      startDate
+	 * @param LocalDate      endDate , for getting Room.
+	 * @return the RoomDTO.
+	 */
 	@HystrixCommand(fallbackMethod = "getAvailableRoomsFallback")
 	private RoomDTO getAvailableRooms(ReservationDTO reservationReqObj, LocalDate startDate, LocalDate endDate) {
 
@@ -151,12 +194,24 @@ public class ReservationServiceImpl implements ReservationService {
 		return room;
 	}
 
+	/**
+	 * Getting the list of available rooms fallback.
+	 */
 	@SuppressWarnings("unused")
 	private RoomDTO getAvailableRoomsFallback(Long hotelId, LocalDate startDate, LocalDate endDate, Long categoryId) {
 		log.error("Room Service is down ");
 		return new RoomDTO();
 	}
 
+	/**
+	 * Creates a Reservation.
+	 * 
+	 * @param ReservationDTO ,
+	 * @param Double         toatlCharges,
+	 * @param OfferDTO
+	 * @param RoomDTO        for creating Reservation.
+	 * @return the saved Reservation.
+	 */
 	private Reservation createEntry(ReservationDTO reservationReqObj, Double totalCharges, OfferDTO offerDTO,
 			RoomDTO roomDTO) {
 
@@ -176,6 +231,12 @@ public class ReservationServiceImpl implements ReservationService {
 				.startDate(reservation.getStartDate()).build();
 	}
 
+	/**
+	 * Fetch the Reservation.
+	 * 
+	 * @param Long reservationId
+	 * @return the Reservation.
+	 */
 	@Override
 	public Reservation get(Long reservationId) {
 		Optional<Reservation> reservation = reservationRepository.findById(reservationId);

@@ -8,9 +8,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ws.rs.core.MediaType;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -62,7 +59,7 @@ class GuestControllerTest extends AbstractTest {
 	}
 
 	@Test
-	void test1SaveGuest() throws Exception {
+	void test1SaveGuest1() throws Exception {
 
 		GuestDTO guestDTOObj = guestDTOObj();
 
@@ -91,10 +88,30 @@ class GuestControllerTest extends AbstractTest {
 	}
 
 	@Test
+	void test1UpateGuest2() throws Exception {
+
+		GuestDTO guestDTOObj = guestDTOObj();
+
+		lenient().doReturn(new Guest()).when(guestService).getGuestById(2L);
+		mockMvc.perform(put("/api/v1/guests/2").contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(guestDTOObj)).accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isBadRequest());
+
+	}
+
+	@Test
+	void test1CreateCategory3() throws Exception {
+		GuestDTO guestDTOObj = guestDTOObj();
+		mockMvc.perform(put("/api/v1/guests/2", 2).contentType(MediaType.APPLICATION_JSON)
+				.content(asJsonString(guestDTOObj)).accept(MediaType.APPLICATION_JSON))
+				.andExpect(status().isInternalServerError());
+
+	}
+
+	@Test
 	void test1GetGuestByName() throws Exception {
 
-		List<GuestDTO> guestResObj = new ArrayList<>();
-		guestResObj.add(guestDTOObj());
+		GuestDTO guestResObj = guestDTOObj();
 
 		lenient().doReturn(guestResObj).when(guestService).getByName("user");
 

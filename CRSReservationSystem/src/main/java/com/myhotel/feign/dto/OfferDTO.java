@@ -1,6 +1,7 @@
-package com.myhotel.feign.dto.request;
+package com.myhotel.feign.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +10,11 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoomCreateRequestDTO {
+@Builder
+public class OfferDTO {
 
-	private Long categoryId;
+	private Long id;
+
+	private Double value;
+
 }
