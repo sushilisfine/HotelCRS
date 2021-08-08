@@ -1,0 +1,16 @@
+server:
+  port: 8080
+
+zuul:
+  routes:
+    hotelService:
+      path: /HotelService/**
+      url: http://localhost:8001
+    guestService:
+      path : /api/v1/guests/**
+      url : http://localhost:8002/
+    reservationService:
+      path: /api/v1/reservations/**
+      url: http://localhost:8002
+      
+  sensitive-headers: Cookie,Set-Cookie
